@@ -1,0 +1,129 @@
+doctype html
+html
+  head
+    title OIDC
+    link(href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.css", rel="stylesheet", type="text/css")
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.0/jquery.js", type="text/javascript")
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js", type="text/javascript")
+    style.    
+        body {
+          background-color: #EFEFEF;
+        }
+        body > .grid {
+          height: 100%;
+        }
+
+        .column {
+          max-width: 450px;
+        }  
+    script.      
+      var data = (!{JSON.stringify(data)});
+
+      function get_tokens() {
+        $('.dimmer').addClass('active');
+        $.ajax({
+            url: data.client.token_url,
+            type: "POST",
+            crossDomain: true,
+            data:
+            {
+              grant_type: 'authorization_code',
+              client_id: data.client.client_id,
+              client_secret: data.client.client_secret,
+              code: data.code,
+              redirect_uri: data.client.redirect_uri,
+              scope: data.client.scope,
+              state: data.state
+            },
+            dataType: "json",
+            success: function (response) {
+                $('#access_token').val(response.access_token);
+                $('#refresh_token').val(response.refresh_token);
+                $('.dimmer').removeClass('active');
+            },
+            error: function (xhr, status) {
+                $('.error.message').show().find('.content').text(xhr.responseText);
+                $('.dimmer').removeClass('active');
+            }
+        });
+      } 
+
+      function refresh_tokens() {
+        var rt = $('#refresh_token').val();
+        if(rt == null || rt == "") {
+          $('.error.message').show().find('.content').text("Refresh token is empty.");
+          return false;
+        }
+        $('.dimmer').addClass('active');
+        $.ajax({
+            url: data.client.token_url,
+            type: "POST",
+            crossDomain: true,
+            data:
+            {
+              grant_type: 'refresh_token',
+              client_id: data.client.client_id,
+              client_secret: data.client.client_secret,
+              refresh_token: rt,
+              scope: data.client.scope,
+              state: data.state
+            },
+            dataType: "json",
+            success: function (response) {
+                $('#access_token').val(response.access_token);
+                $('.error.message').hide()
+                if(response.refresh_token)
+                  $('#refresh_token').val(response.refresh_token);
+                $('.dimmer').removeClass('active');
+            },
+            error: function (xhr, status) {
+                $('.error.message').show().find('.content').text(xhr.responseText);
+                $('.dimmer').removeClass('active');
+            }
+        });
+      } 
+
+      $(document).ready(function() {
+        if(location.search.indexOf('code=') >= 0)
+          get_tokens();
+
+        $("button.copy").click(function(evt) {
+          var inp = $(evt.target).parents('.input').find('input');
+          if(!inp)
+            return;
+          inp.select();
+          document.execCommand("copy");
+        })
+      })
+  body
+    .ui.page.dimmer
+      .ui.text.loader 
+        |Loading
+    .ui.middle.aligned.center.aligned.grid
+      .column
+        .ui.header: center OIDC
+        .ui.error.message(style="display: none")
+          .ui.header ERROR
+          .content ...
+        .ui.form
+          .field
+            label code: 
+            .ui.action.input
+              input(type="text", id="code", value=data.code)
+              button.ui.teal.icon.copy.button
+                i.copy.icon
+          .field
+            label access_token: 
+            .ui.action.input
+              input(type="text", id="access_token")
+              button.ui.grey.icon.button(onclick="refresh_tokens()")
+                i.refresh.icon
+              button.ui.teal.icon.copy.button
+                i.copy.icon
+          .field
+            label refresh_token: 
+            .ui.action.input
+              input(type="text", id="refresh_token")
+              button.ui.teal.icon.copy.button
+                i.copy.icon
+
