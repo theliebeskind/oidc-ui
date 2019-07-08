@@ -2,11 +2,9 @@
 
 A simple OIDC UI.
 
-<center>
-
-![Screenshot](screenshot.gif)
-
-</center>
+<p align="center">
+<img src="screenshot.gif" />
+</p>
 
 ## Setup
 
