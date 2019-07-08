@@ -42,6 +42,7 @@ app.get('/oidc', (req, res) => {
 	})
 })
 
-app.listen(8082, () => {
-  console.log('Startet OIDC-Server')
+let port = process.env.PORT ? (process.env.PORT | 0) : 8080
+app.listen(port, () => {
+  console.log('Started OIDC-Server on port', port)
 })
