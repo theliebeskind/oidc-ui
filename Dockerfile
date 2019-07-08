@@ -8,6 +8,6 @@ RUN npm install
 
 COPY . /usr/src/app
 
-EXPOSE 8082
+EXPOSE 8080
 
 CMD [ "npm", "start" ]
