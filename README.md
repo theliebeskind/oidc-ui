@@ -20,6 +20,8 @@ A simple OIDC UI.
 - Start docker as usual,
 - optionally setting a custom port via the PORT env var
 
+Or simply use the docker image available at https://hub.docker.io: `docker pull theliebeskind/oidc-ui`
+
 ## Usage
 
 - Enter client credentials in section "client"
